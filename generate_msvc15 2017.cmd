@@ -1,3 +1,6 @@
+rem version vs
+rem SET DEV_TOOLS_MSVC="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
+rem call %DEV_TOOLS_MSVC% amd64
 SET CMAKE_PREFIX_PATH="qt path"
 SET CMAKE_TOOLCHAIN_FILE="vcpkg path"
 mkdir build
