@@ -1,6 +1,7 @@
 ﻿#include <catch2/catch.hpp>
 
 #include <common/common_type.hpp>
+#include <common/local_time.hpp>
 
 using namespace barmaley::lib;
 
@@ -18,22 +19,24 @@ TEST_CASE("Convert common type from json")
 
     auto s = state_j.get<State>();
 
+    auto now = std::chrono::system_clock::now();
+
+    auto localTime = [&](const std::chrono::system_clock::time_point& tp) {
+        return ::barmaley::lib::localtime(tp, "%d.%m.%y %D");
+    };
+
+    auto uptime       = localTime(now - std::chrono::seconds(45678));
+    auto connectionTp = localTime(now - std::chrono::seconds(4564));
+
     auto d = debug_j.get<Debug>();
 
-    REQUIRE(*d.lastChanged == "Default");
-    REQUIRE(*d.uptime == std::chrono::seconds(45678));
-    REQUIRE(*d.heap == 45646);
-    REQUIRE(*d.connectionTimepoint == std::chrono::seconds(4564));
-    REQUIRE(*d.reconnectCount == 787);
-    REQUIRE(*d.rssi == -63);
+    REQUIRE(d.lastChanged == "Default");
+    REQUIRE(localTime(d.uptime) == uptime);
+    REQUIRE(d.heap == 45646);
+    REQUIRE(localTime(d.connectionTimepoint) == connectionTp);
+    REQUIRE(d.reconnectCount == 787);
+    REQUIRE(d.rssi == -63);
     REQUIRE(*d.lastReasonReconnection == "AP_NOT_FOUND");
-
-    json debug_j_2 = R"({ "last_change" : "Default" }
-                   )"_json;
-
-    auto d_2 = debug_j_2.get<Debug>();
-
-    REQUIRE(d_2.uptime == std::nullopt);
 
     auto debug_j_3 =
         R"({

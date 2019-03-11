@@ -23,12 +23,12 @@ constexpr std::uint32_t toUint32(DeviceId v)
 
 struct Debug
 {
-    std::optional<std::string> lastChanged;
-    std::optional<std::chrono::seconds> uptime;
-    std::optional<std::uint32_t> heap;
-    std::optional<std::chrono::seconds> connectionTimepoint;
-    std::optional<std::uint32_t> reconnectCount;
-    std::optional<int> rssi;
+    std::string lastChanged;
+    std::chrono::system_clock::time_point uptime;
+    std::uint32_t heap;
+    std::chrono::system_clock::time_point connectionTimepoint;
+    std::uint32_t reconnectCount;
+    int rssi;
     std::optional<std::string> lastReasonReconnection;
 };
 

@@ -12,12 +12,18 @@ void from_json(const json& j, State& s)
 }
 void from_json(const json& j, Debug& d)
 {
-    d.lastChanged            = j.value("last_change", string_opt{std::nullopt});
-    d.uptime                 = j.value("uptime", seconds_opt{std::nullopt});
-    d.heap                   = j.value("heap", uint32_opt{std::nullopt});
-    d.connectionTimepoint    = j.value("connection_timepoint", seconds_opt{std::nullopt});
-    d.reconnectCount         = j.value("reconnect_count", uint32_opt{std::nullopt});
-    d.rssi                   = j.value("rssi", std::optional<int>{std::nullopt});
+    auto now = std::chrono::system_clock::now();
+    std::chrono::seconds uptime;
+    std::chrono::seconds connection_timepoint;
+
+    j.at("last_change").get_to(d.lastChanged);
+    j.at("uptime").get_to(uptime);
+    d.uptime = now - uptime;
+    j.at("heap").get_to(d.heap);
+    j.at("connection_timepoint").get_to(connection_timepoint);
+    d.connectionTimepoint = now - connection_timepoint;
+    j.at("reconnect_count").get_to(d.reconnectCount);
+    j.at("rssi").get_to(d.rssi);
     d.lastReasonReconnection = j.value("last_reason_reconnection", string_opt{std::nullopt});
 }
 } // namespace barmaley::lib

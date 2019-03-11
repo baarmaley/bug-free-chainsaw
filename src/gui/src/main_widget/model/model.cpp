@@ -3,21 +3,18 @@
 #include <iomanip>
 #include <sstream>
 
+#include <common/local_time.hpp>
 #include <current_state_model/current_state_model.hpp>
 
+namespace barmaley::gui {
+
 namespace {
-QString toLocalTime(const std::chrono::system_clock::time_point now,
-                    const std::chrono::seconds& dur = std::chrono::seconds{0})
+QString toLocalTime(const std::chrono::system_clock::time_point tp)
 {
-    auto t = std::chrono::system_clock::to_time_t(now - dur);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&t), "%d.%m.%y %T");
-    return QString::fromStdString(ss.str());
+    return QString::fromStdString(lib::localtime(tp, "%d.%m.%y %T"));
 }
 
 } // namespace
-
-namespace barmaley::gui {
 
 Model::Model(lib::CurrentStateModelView& modelView) : currentStateModel(modelView.currentStateModel)
 {
@@ -55,8 +52,6 @@ QVariant Model::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
-    auto timepointNow = std::chrono::system_clock::now();
-
     auto key          = order[index.row()];
     const auto& value = *currentStateModel.value(key);
     const auto& state = value.state;
@@ -76,21 +71,20 @@ QVariant Model::data(const QModelIndex& index, int role) const
         case TypeColumn::STATE:
             return QString::fromStdString(state.state);
         case TypeColumn::LAST_CHANGED:
-            return (debug && debug->lastChanged) ? QString::fromStdString(*debug->lastChanged) : QVariant();
+            return debug ? QString::fromStdString(debug->lastChanged) : QStringLiteral("-");
         case TypeColumn::UPTIME:
-            return (debug && debug->uptime) ? toLocalTime(timepointNow, *debug->uptime) : QVariant();
+            return debug ? toLocalTime(debug->uptime) : QStringLiteral("-");
         case TypeColumn::HEAP:
-            return (debug && debug->heap) ? *debug->heap : QVariant();
+            return debug ? debug->heap : QVariant(QStringLiteral("-"));
         case TypeColumn::CONNECTION_TIMEPOINT:
-            return (debug && debug->connectionTimepoint) ? toLocalTime(timepointNow, *debug->connectionTimepoint)
-                                                         : QVariant();
+            return debug ? toLocalTime(debug->connectionTimepoint) : QStringLiteral("-");
         case TypeColumn::RECONNECT_COUNT:
-            return (debug && debug->reconnectCount) ? *debug->reconnectCount : QVariant();
+            return debug ? debug->reconnectCount : QVariant(QStringLiteral("-"));
         case TypeColumn::LAST_REASON_RECONNECTION:
             return (debug && debug->lastReasonReconnection) ? QString::fromStdString(*debug->lastReasonReconnection)
-                                                            : QVariant();
+                                                            : QStringLiteral("-");
         case TypeColumn::RSSI:
-            return (debug && debug->rssi) ? *debug->rssi : QVariant();
+            return debug ? debug->rssi : QVariant(QStringLiteral("-"));
         default:
             return QVariant();
     }
