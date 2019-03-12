@@ -73,11 +73,11 @@ QVariant Model::data(const QModelIndex& index, int role) const
         case TypeColumn::LAST_CHANGED:
             return debug ? QString::fromStdString(debug->lastChanged) : QStringLiteral("-");
         case TypeColumn::UPTIME:
-            return debug ? toLocalTime(debug->uptime) : QStringLiteral("-");
+            return debug ? toLocalTime(debug->uptimeTp()) : QStringLiteral("-");
         case TypeColumn::HEAP:
             return debug ? debug->heap : QVariant(QStringLiteral("-"));
         case TypeColumn::CONNECTION_TIMEPOINT:
-            return debug ? toLocalTime(debug->connectionTimepoint) : QStringLiteral("-");
+            return debug ? toLocalTime(debug->connectionTp()) : QStringLiteral("-");
         case TypeColumn::RECONNECT_COUNT:
             return debug ? debug->reconnectCount : QVariant(QStringLiteral("-"));
         case TypeColumn::LAST_REASON_RECONNECTION:

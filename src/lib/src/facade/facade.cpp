@@ -14,9 +14,9 @@ std::tuple<State, std::optional<Debug>> parser(std::string&& data)
     return std::make_tuple(std::move(state), std::move(debug));
 }
 } // namespace
-Facade::Facade()
+Facade::Facade() : facadeView(*this), journalManager(facadeView, model.currentStateModelView)
 {
-    ñonnectionsContainer += receiver.onReceived([this] {
+    connectionsContainer += receiver.onReceived([this] {
         while (!receiver.empty()) {
             auto p  = receiver.packet();
             auto ip = p.ip;
@@ -24,7 +24,7 @@ Facade::Facade()
                 auto [state, debug] = parser(std::move(p.data));
                 model.insertOrUpdate(std::move(p.ip), std::move(state), std::move(debug));
             } catch (const json::exception& e) {
-                qWarning() << QString::fromStdString(ip) << e.what();
+                facadeView.protocolErrorEvent(std::move(ip), e.what());
             }
         }
     });

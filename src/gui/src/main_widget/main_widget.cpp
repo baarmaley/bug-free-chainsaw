@@ -1,5 +1,6 @@
 #include <main_widget/main_widget.hpp>
 
+#include <main_widget/model/journal_model.hpp>
 #include <main_widget/model/model.hpp>
 
 #include <QLineEdit>
@@ -7,21 +8,24 @@
 #include <QVBoxLayout>
 
 namespace barmaley::gui {
-MainWidget::MainWidget(QWidget* parent) : QWidget(parent), tableView(new QTableView(this))
+MainWidget::MainWidget(QWidget* parent)
+    : QWidget(parent), currentStateTableView(new QTableView(this)), journalTableView(new QTableView(this))
 {
     QLineEdit* lineEdit     = new QLineEdit(this);
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
     mainLayout->addWidget(lineEdit);
-    mainLayout->addWidget(tableView);
+    mainLayout->addWidget(currentStateTableView);
+    mainLayout->addWidget(journalTableView);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Esp Watcher"));
 }
 MainWidget::~MainWidget() = default;
 
-void MainWidget::setModel(Model* model)
+void MainWidget::setModel(Model* model, JournalModel* journalModel)
 {
-    tableView->setModel(model);
+    currentStateTableView->setModel(model);
+    journalTableView->setModel(journalModel);
 }
 } // namespace barmaley::gui

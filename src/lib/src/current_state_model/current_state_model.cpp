@@ -52,6 +52,7 @@ void CurrentStateModel::insertOrUpdate(std::string ip, State state, std::optiona
     } else {
         it->second.ip         = ip;
         it->second.state      = std::move(state);
+        it->second.debug      = std::move(debug);
         it->second.lastUpdate = std::chrono::system_clock::now();
         ++it->second.numberOfPacketsReceived;
         currentStateModelView.itemUpdateEvent(deviceId);

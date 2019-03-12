@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include <QAbstractTableModel>
 #include <QString>
 
@@ -20,7 +18,7 @@ class Model : public QAbstractTableModel
 public:
     Model(lib::CurrentStateModelView& modelView);
 
-    enum TypeColumn
+    enum TypeColumn : std::uint32_t
     {
         IP = 0,
         PACKETS_RECEIVED,

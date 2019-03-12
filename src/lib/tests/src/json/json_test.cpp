@@ -31,9 +31,9 @@ TEST_CASE("Convert common type from json")
     auto d = debug_j.get<Debug>();
 
     REQUIRE(d.lastChanged == "Default");
-    REQUIRE(localTime(d.uptime) == uptime);
+    REQUIRE(localTime(d.uptimeTp()) == uptime);
     REQUIRE(d.heap == 45646);
-    REQUIRE(localTime(d.connectionTimepoint) == connectionTp);
+    REQUIRE(localTime(d.connectionTp()) == connectionTp);
     REQUIRE(d.reconnectCount == 787);
     REQUIRE(d.rssi == -63);
     REQUIRE(*d.lastReasonReconnection == "AP_NOT_FOUND");

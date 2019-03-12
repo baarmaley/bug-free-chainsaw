@@ -12,16 +12,12 @@ void from_json(const json& j, State& s)
 }
 void from_json(const json& j, Debug& d)
 {
-    auto now = std::chrono::system_clock::now();
-    std::chrono::seconds uptime;
-    std::chrono::seconds connection_timepoint;
+    d.receivedDate = std::chrono::system_clock::now();
 
     j.at("last_change").get_to(d.lastChanged);
-    j.at("uptime").get_to(uptime);
-    d.uptime = now - uptime;
+    j.at("uptime").get_to(d.uptime);
     j.at("heap").get_to(d.heap);
-    j.at("connection_timepoint").get_to(connection_timepoint);
-    d.connectionTimepoint = now - connection_timepoint;
+    j.at("connection_timepoint").get_to(d.connectionDuration);
     j.at("reconnect_count").get_to(d.reconnectCount);
     j.at("rssi").get_to(d.rssi);
     d.lastReasonReconnection = j.value("last_reason_reconnection", string_opt{std::nullopt});
