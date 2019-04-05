@@ -58,19 +58,14 @@ struct Journal
 
 struct LastState
 {
-    struct Debug
-    {
-        Debug(std::uint32_t heap, std::chrono::seconds uptime, std::chrono::seconds connectionDuration)
-            : heap(heap), uptime(uptime), connectionDuration(connectionDuration)
-        {
-        }
-        std::uint32_t heap;
-        std::chrono::seconds uptime;
-        std::chrono::seconds connectionDuration;
-    };
+	LastState(const CurrentState& currentState);
+
     std::chrono::steady_clock::time_point lastUpdate = std::chrono::steady_clock::now();
     std::string ip;
-    std::optional<Debug> debug;
+    std::uint32_t heap;
+    std::chrono::seconds uptime;
+    std::chrono::seconds connectionDuration;
+
     bool connectionLost = false;
 };
 class JournalManager;
@@ -135,6 +130,7 @@ private:
     Timer udateTimer;
     ConnectionsContainer connectionsContainer;
     std::unordered_map<DeviceId, LastState> lastStates;
+	std::unordered_map<std::string, std::string> recentBadProtocolEvents;
 };
 
 } // namespace barmaley::lib

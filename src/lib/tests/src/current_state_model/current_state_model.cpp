@@ -11,10 +11,9 @@ TEST_CASE("Current state model test")
 
     CurrentStateModel currentStateModel;
     {
-        State newState;
-        newState.id         = DeviceId{20};
-        newState.deviceType = "something";
-        newState.state      = "state";
+        Status newStatus;
+		newStatus.id         = DeviceId{20};
+		newStatus.deviceType = "something";
 
         ConnectionsContainer connectionsContainer;
 
@@ -23,30 +22,28 @@ TEST_CASE("Current state model test")
         connectionsContainer +=
             currentStateModel.currentStateModelView.onUpdate([&updateResult](DeviceId) { updateResult += "Ok"; });
 
-        currentStateModel.insertOrUpdate("", std::move(newState), std::nullopt);
+        currentStateModel.insertOrUpdate("", std::move(newStatus));
 
         REQUIRE(addResult == "Ok");
 
-        State updateState;
-        updateState.id         = DeviceId{20};
-        updateState.deviceType = "something two";
-        updateState.state      = "state 2";
+		Status updateStatus;
+		updateStatus.id         = DeviceId{20};
+		updateStatus.deviceType = "something two";
 
-        currentStateModel.insertOrUpdate("", std::move(updateState), std::nullopt);
+        currentStateModel.insertOrUpdate("", std::move(updateStatus));
 
         REQUIRE(updateResult == "Ok");
 
         auto v = currentStateModel.value(DeviceId{20});
 
         REQUIRE(v);
-        REQUIRE(v->state.state == "state 2");
+        REQUIRE(v->status.deviceType == "something two");
     }
 
-    State updateState;
-    updateState.id         = DeviceId{20};
-    updateState.deviceType = "something two";
-    updateState.state      = "state 2";
-    currentStateModel.insertOrUpdate("", std::move(updateState), std::nullopt);
+	Status updateStatus;
+	updateStatus.id         = DeviceId{20};
+	updateStatus.deviceType = "something three";
+    currentStateModel.insertOrUpdate("", std::move(updateStatus));
 
     REQUIRE(updateResult == "Ok");
 }

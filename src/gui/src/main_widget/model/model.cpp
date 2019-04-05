@@ -52,10 +52,10 @@ QVariant Model::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
-    auto key          = order[index.row()];
-    const auto& value = *currentStateModel.value(key);
-    const auto& state = value.state;
-    const auto& debug = value.debug;
+    auto key             = order[index.row()];
+    const auto& value    = *currentStateModel.value(key);
+    const auto& status   = value.status;
+    const auto& wifiInfo = status.wifiInfo;
 
     switch (index.column()) {
         case TypeColumn::IP:
@@ -65,26 +65,26 @@ QVariant Model::data(const QModelIndex& index, int role) const
         case TypeColumn::LAST_UPDATE:
             return toLocalTime(value.lastUpdate);
         case TypeColumn::ID:
-            return QString::number(toUint32(value.state.id));
+            return QString::number(toUint32(status.id));
         case TypeColumn::DEVICE_TYPE:
-            return QString::fromStdString(state.deviceType);
-        case TypeColumn::STATE:
-            return QString::fromStdString(state.state);
+            return QString::fromStdString(status.deviceType);
+        case TypeColumn::DEVICE_NAME:
+            return QString::fromStdString(status.name);
         case TypeColumn::LAST_CHANGED:
-            return debug ? QString::fromStdString(debug->lastChanged) : QStringLiteral("-");
+            return QString::fromStdString(status.gpioInfo.lastChanged);
         case TypeColumn::UPTIME:
-            return debug ? toLocalTime(debug->uptimeTp()) : QStringLiteral("-");
+            return toLocalTime(status.uptimeTp());
         case TypeColumn::HEAP:
-            return debug ? debug->heap : QVariant(QStringLiteral("-"));
+            return status.heap;
         case TypeColumn::CONNECTION_TIMEPOINT:
-            return debug ? toLocalTime(debug->connectionTp()) : QStringLiteral("-");
+            return toLocalTime(status.connectionTp());
         case TypeColumn::RECONNECT_COUNT:
-            return debug ? debug->reconnectCount : QVariant(QStringLiteral("-"));
+            return wifiInfo.reconnectCount;
         case TypeColumn::LAST_REASON_RECONNECTION:
-            return (debug && debug->lastReasonReconnection) ? QString::fromStdString(*debug->lastReasonReconnection)
-                                                            : QStringLiteral("-");
+            return (wifiInfo.lastReasonReconnection) ? QString::fromStdString(*wifiInfo.lastReasonReconnection)
+                                                     : QStringLiteral("-");
         case TypeColumn::RSSI:
-            return debug ? debug->rssi : QVariant(QStringLiteral("-"));
+            return wifiInfo.rssi;
         default:
             return QVariant();
     }
@@ -106,8 +106,8 @@ QVariant Model::headerData(int section, Qt::Orientation orientation, int role) c
             return "ID";
         case TypeColumn::DEVICE_TYPE:
             return "DEVICE_TYPE";
-        case TypeColumn::STATE:
-            return "STATE";
+		case TypeColumn::DEVICE_NAME:
+            return "DEVICE_NAME";
         case TypeColumn::LAST_CHANGED:
             return "LAST_CHANGED";
         case TypeColumn::UPTIME:

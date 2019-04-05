@@ -25,7 +25,7 @@ public:
         LAST_UPDATE,
         ID,
         DEVICE_TYPE,
-        STATE,
+		DEVICE_NAME,
         LAST_CHANGED,
         UPTIME,
         HEAP,

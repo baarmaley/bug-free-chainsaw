@@ -39,20 +39,19 @@ const CurrentState* CurrentStateModel::value(DeviceId id) const
     return &it->second;
 }
 
-void CurrentStateModel::insertOrUpdate(std::string ip, State state, std::optional<Debug> debug)
+void CurrentStateModel::insertOrUpdate(std::string ip, Status status)
 {
-    auto deviceId = state.id;
+    auto deviceId = status.id;
     auto it       = items.find(deviceId);
     if (it == items.end()) {
         items.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(deviceId),
-            std::forward_as_tuple(std::move(state), std::move(debug), std::move(ip), std::chrono::system_clock::now()));
+            std::forward_as_tuple(std::move(status), std::move(ip), std::chrono::system_clock::now()));
         currentStateModelView.itemAddedEvent(deviceId);
     } else {
         it->second.ip         = ip;
-        it->second.state      = std::move(state);
-        it->second.debug      = std::move(debug);
+        it->second.status      = std::move(status);
         it->second.lastUpdate = std::chrono::system_clock::now();
         ++it->second.numberOfPacketsReceived;
         currentStateModelView.itemUpdateEvent(deviceId);

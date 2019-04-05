@@ -4,24 +4,19 @@
 #include <facade/facade_view.hpp>
 
 namespace barmaley::lib {
-namespace {
-LastState makeLastState(const CurrentState& currentState)
-{
-    LastState lastState;
-    lastState.ip = currentState.ip;
-    if (currentState.debug) {
-        const auto& debug = *currentState.debug;
-        lastState.debug   = LastState::Debug(debug.heap, debug.uptime, debug.connectionDuration);
-    }
-    return lastState;
-}
-} // namespace
 JournalManager::JournalManager(FacadeView& facadeView, CurrentStateModelView& currentStateModelView)
     : udateTimer(intervalUdpdate)
 {
     connectionsContainer += facadeView.onProtocolError([this](std::string ip, std::string errorString) {
+        auto it = recentBadProtocolEvents.find(ip);
+        if (it != recentBadProtocolEvents.end() && it->second == errorString) {
+            return;
+        }
+
         auto addedGuard = beginAddedEntry();
-        journal.createEntry<BadProtocolJE>(addedGuard.id, std::move(ip), std::move(errorString));
+        journal.createEntry<BadProtocolJE>(addedGuard.id, ip, errorString);
+
+        recentBadProtocolEvents.emplace(std::move(ip), std::move(errorString));
     });
 
     auto currentState = [&currentStateModelView](DeviceId id) {
@@ -32,7 +27,7 @@ JournalManager::JournalManager(FacadeView& facadeView, CurrentStateModelView& cu
         auto addedGuard = beginAddedEntry();
         auto state      = currentState(id);
 
-        lastStates.emplace(id, makeLastState(*state));
+        lastStates.emplace(id, *state);
         journal.createEntry<DeviceDetectedJE>(addedGuard.id, id, state->ip);
     });
 
@@ -41,24 +36,23 @@ JournalManager::JournalManager(FacadeView& facadeView, CurrentStateModelView& cu
         assert((lastStatesIt != lastStates.end()));
         auto oldState            = lastStatesIt->second;
         auto state               = currentState(id);
-        lastStatesIt->second     = makeLastState(*state);
+        lastStatesIt->second     = LastState(*state);
         const auto& currentState = lastStatesIt->second;
 
         if (oldState.ip != currentState.ip) {
             auto addedGuard = beginAddedEntry();
             journal.createEntry<IpChangedJE>(addedGuard.id, id, std::move(oldState.ip), currentState.ip);
         }
-        if (oldState.debug && currentState.debug) {
-            if (oldState.debug->uptime > currentState.debug->uptime) {
-                auto addedGuard = beginAddedEntry();
-                journal.createEntry<RebootDetectJE>(addedGuard.id, id);
-            }else if (oldState.debug->connectionDuration > currentState.debug->connectionDuration) {
-                auto addedGuard = beginAddedEntry();
-                std::string lastReasonReconnection =
-                    (*state->debug).lastReasonReconnection ? *(*state->debug).lastReasonReconnection : "";
-                journal.createEntry<ReconnectDetectedJE>(
-                    addedGuard.id, id, (*state->debug).reconnectCount, lastReasonReconnection);
-            }
+        if (oldState.uptime > currentState.uptime) {
+            auto addedGuard = beginAddedEntry();
+            journal.createEntry<RebootDetectJE>(addedGuard.id, id);
+        } else if (oldState.connectionDuration > currentState.connectionDuration) {
+            auto addedGuard      = beginAddedEntry();
+            const auto& wifiInfo = state->status.wifiInfo;
+            std::string lastReasonReconnection =
+                wifiInfo.lastReasonReconnection ? *wifiInfo.lastReasonReconnection : "";
+            journal.createEntry<ReconnectDetectedJE>(
+                addedGuard.id, id, wifiInfo.reconnectCount, lastReasonReconnection);
         }
 
         if (oldState.connectionLost && !currentState.connectionLost) {
@@ -85,5 +79,12 @@ JournalManagerView::~JournalManagerView() = default;
 s2::connection JournalManagerView::onAdded(SignalType::slot_type slot)
 {
     return itemAddedEvent.connect(std::move(slot));
+}
+LastState::LastState(const CurrentState& currentState)
+    : ip(currentState.ip),
+      heap(currentState.status.heap),
+      uptime(currentState.status.uptime),
+      connectionDuration(currentState.status.wifiInfo.connectionDuration)
+{
 }
 } // namespace barmaley::lib

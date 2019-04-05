@@ -9,13 +9,9 @@ namespace barmaley::lib {
 
 struct CurrentState
 {
-    CurrentState(State state,
-                 std::optional<Debug> debug,
-                 std::string ip,
-                 std::chrono::system_clock::time_point lastUpdate)
-        : state(std::move(state)), debug(std::move(debug)), ip(std::move(ip)), lastUpdate(std::move(lastUpdate)){};
-    State state;
-    std::optional<Debug> debug;
+    CurrentState(Status status, std::string ip, std::chrono::system_clock::time_point lastUpdate)
+        : status(std::move(status)), ip(std::move(ip)), lastUpdate(std::move(lastUpdate)){};
+    Status status;
     std::string ip;
     std::uint32_t numberOfPacketsReceived = 0;
     std::chrono::system_clock::time_point lastUpdate;
@@ -64,7 +60,7 @@ public:
 
     const CurrentState* value(DeviceId id) const;
 
-    void insertOrUpdate(std::string ip, State state, std::optional<Debug> debug);
+    void insertOrUpdate(std::string ip, Status status);
 
     CurrentStateModelView currentStateModelView;
 
