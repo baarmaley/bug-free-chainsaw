@@ -17,7 +17,16 @@ void from_json(const json& j, WifiInfo& w)
     j.at("connection_timepoint").get_to(w.connectionDuration);
     j.at("reconnect_count").get_to(w.reconnectCount);
     j.at("rssi").get_to(w.rssi);
-    w.lastReasonReconnection = j.value("last_reason_reconnection", string_opt{std::nullopt});
+
+    // Todo: update after apply pr "Feat/explicit conversion operator" 
+    // w.lastReasonReconnection = j.value("last_reason_reconnection", string_opt{std::nullopt});
+    w.lastReasonReconnection = [&]() -> std::optional<std::string> {
+        try {
+            return j.at("last_reason_reconnection").get<std::string>();
+        } catch (const json::out_of_range&) {
+            return std::nullopt;
+        }
+    }();
 }
 void from_json(const json& j, GpioInfo& g)
 {

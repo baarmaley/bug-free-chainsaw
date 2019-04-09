@@ -1,0 +1,11 @@
+[requires]
+boost_signals2/1.69.0@bincrafters/stable
+Catch2/2.7.1@catchorg/stable
+jsonformoderncpp/3.6.1@vthiery/stable
+#qt/5.12.2@bincrafters/stable
+
+[generators]
+cmake
+
+[imports]
+lib, *.so* -> ./lib
