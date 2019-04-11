@@ -8,6 +8,8 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Boost)
+find_package(cpprestsdk REQUIRED)
+
 
 file(GLOB_RECURSE TARGET_SOURCES
     src/*.cpp)
@@ -46,6 +48,8 @@ target_link_libraries(${PROJECT_NAME}
         Qt5::Core
         Qt5::Network
 		Boost::boost
-        nlohmann_json::nlohmann_json)
+        nlohmann_json::nlohmann_json
+	PRIVATE
+		cpprestsdk::cpprest)
 
 add_subdirectory(tests)

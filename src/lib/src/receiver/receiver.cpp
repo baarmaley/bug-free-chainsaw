@@ -34,7 +34,8 @@ void Receiver::processPendingDatagrams()
         datagram.resize(udpSocket->pendingDatagramSize());
         QHostAddress senderAddress;
         udpSocket->readDatagram(datagram.data(), datagram.size(), &senderAddress);
-        receivedPackets.emplace(senderAddress.toString().toStdString(), datagram.toStdString());
+		// QHostAddress(senderAddress.toIPv4Address()): fix side effect a ipv4 mapped ipv6
+        receivedPackets.emplace(QHostAddress(senderAddress.toIPv4Address()).toString().toStdString(), datagram.toStdString());
     }
     packetReceivedEvent();
 }
