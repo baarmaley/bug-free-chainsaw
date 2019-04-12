@@ -3,6 +3,7 @@
 #include <current_state_model/current_state_model.hpp>
 #include <facade/facade_view.hpp>
 
+
 namespace barmaley::lib {
 JournalManager::JournalManager(FacadeView& facadeView, CurrentStateModelView& currentStateModelView)
     : udateTimer(intervalUdpdate)

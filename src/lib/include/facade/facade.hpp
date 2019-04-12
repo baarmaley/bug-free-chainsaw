@@ -5,7 +5,9 @@
 #include <facade/facade_view.hpp>
 #include <journal/journal.hpp>
 #include <receiver/receiver.h>
+#include <request_manager/request_manager_fwd.hpp>
 
+#include <memory>
 namespace barmaley::lib {
 class Facade
 {
@@ -26,6 +28,7 @@ public:
 private:
     FacadeView facadeView;
     Receiver receiver;
+    std::unique_ptr<RequestManager> requestManager;
     CurrentStateModel model;
     JournalManager journalManager;
     ConnectionsContainer connectionsContainer;

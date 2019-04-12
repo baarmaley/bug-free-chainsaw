@@ -1,9 +1,15 @@
 #include <facade/facade.hpp>
 
+#include <request_manager/request_manager.hpp>
+
 #include <QDebug>
 
 namespace barmaley::lib {
-Facade::Facade() : facadeView(*this), journalManager(facadeView, model.currentStateModelView)
+
+Facade::Facade()
+    : facadeView(*this),
+      requestManager(std::make_unique<RequestManager>()),
+      journalManager(facadeView, model.currentStateModelView)
 {
     connectionsContainer += receiver.onReceived([this] {
         while (!receiver.empty()) {
@@ -17,5 +23,6 @@ Facade::Facade() : facadeView(*this), journalManager(facadeView, model.currentSt
         }
     });
 }
+} // namespace barmaley::lib
 Facade::~Facade() = default;
 } // namespace barmaley::lib
