@@ -23,4 +23,42 @@ Facade::Facade()
     });
 }
 Facade::~Facade() = default;
+void Facade::groupCommand(DeviceId id, GroupCommand cmd)
+{
+    auto url = "http://" + model.value(id)->ip + "/action/";
+    switch (cmd) {
+        case GroupCommand::on:
+            url += "all_on";
+            break;
+        case GroupCommand::off:
+            url += "all_off";
+            break;
+        default:
+            break;
+    }
+    requestManager->request(
+        url,
+        [](auto) { qDebug() << "groupCommand: Ok"; },
+        [](RequestManager::Error e) { qDebug() << "groupCommand: Error" << QString::fromStdString(e.what); });
+}
+void Facade::singleCommand(DeviceId id, RelayId relayId, SingleCommand cmd)
+{
+    auto url = "http://" + model.value(id)->ip + "/action/";
+    switch (cmd) {
+        case SingleCommand::on:
+            url += "on";
+            break;
+        case SingleCommand::off:
+            url += "off";
+            break;
+        case SingleCommand::inv:
+            url += "inversion";
+            break;
+    }
+    url += "/" + std::to_string(toUint32(relayId));
+    requestManager->request(
+        url,
+        [](auto) { qDebug() << "singleCommand: Ok"; },
+        [](RequestManager::Error e) { qDebug() << "singleCommand: Error" << QString::fromStdString(e.what); });
+}
 } // namespace barmaley::lib

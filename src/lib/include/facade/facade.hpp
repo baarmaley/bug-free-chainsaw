@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/signals2.hpp>
+#include <common/relay_command.hpp>
 #include <current_state_model/current_state_model.hpp>
 #include <facade/facade_view.hpp>
 #include <journal/journal.hpp>
@@ -24,6 +25,9 @@ public:
     {
         return journalManager.view();
     }
+
+    void groupCommand(DeviceId id, GroupCommand cmd);
+    void singleCommand(DeviceId id, RelayId relayId, SingleCommand cmd);
 
 private:
     FacadeView facadeView;

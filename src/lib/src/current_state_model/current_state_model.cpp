@@ -20,6 +20,16 @@ s2::connection CurrentStateModelView::onRemoved(SignalType::slot_type slot)
     return itemRemovedEvent.connect(std::move(slot));
 }
 
+s2::connection CurrentStateModelView::onIpChanged(SignalType::slot_type slot)
+{
+    return ipChangedEvent.connect(std::move(slot));
+}
+
+s2::connection CurrentStateModelView::onRelayVectorChanged(SignalType::slot_type slot)
+{
+    return relayVectorChangedEvent.connect(std::move(slot));
+}
+
 CurrentStateModel::CurrentStateModel() : currentStateModelView(*this) {}
 
 CurrentStateModel::~CurrentStateModel()
@@ -44,14 +54,20 @@ void CurrentStateModel::insertOrUpdate(std::string ip, Status status)
     auto deviceId = status.id;
     auto it       = items.find(deviceId);
     if (it == items.end()) {
-        items.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(deviceId),
-            std::forward_as_tuple(std::move(status), std::move(ip), std::chrono::system_clock::now()));
+        items.emplace(std::piecewise_construct,
+                      std::forward_as_tuple(deviceId),
+                      std::forward_as_tuple(std::move(status), std::move(ip), std::chrono::system_clock::now()));
         currentStateModelView.itemAddedEvent(deviceId);
     } else {
-        it->second.ip         = ip;
-        it->second.status      = std::move(status);
+        if (it->second.ip != ip) {
+            it->second.ip = ip;
+            currentStateModelView.ipChangedEvent(deviceId);
+        }
+        bool updateVectorSlot = (it->second.status.relays != status.relays);
+        it->second.status     = std::move(status);
+        if (updateVectorSlot) {
+            currentStateModelView.relayVectorChangedEvent(deviceId);
+        }
         it->second.lastUpdate = std::chrono::system_clock::now();
         ++it->second.numberOfPacketsReceived;
         currentStateModelView.itemUpdateEvent(deviceId);

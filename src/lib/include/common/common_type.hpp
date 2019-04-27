@@ -57,6 +57,11 @@ struct Relay
     std::string name;
 };
 
+inline bool operator==(const Relay& lhs, const Relay& rhs)
+{
+    return lhs.id == rhs.id && lhs.status == rhs.status && lhs.name == rhs.name;
+}
+
 struct WifiInfo
 {
     std::chrono::seconds connectionDuration;

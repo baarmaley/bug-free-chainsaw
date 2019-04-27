@@ -34,6 +34,8 @@ public:
     s2::connection onAdded(SignalType::slot_type slot);
     s2::connection onUpdate(SignalType::slot_type slot);
     s2::connection onRemoved(SignalType::slot_type slot);
+    s2::connection onIpChanged(SignalType::slot_type slot);
+    s2::connection onRelayVectorChanged(SignalType::slot_type slot);
 
     const CurrentStateModel& currentStateModel;
 
@@ -41,6 +43,8 @@ protected:
     SignalType itemAddedEvent;
     SignalType itemUpdateEvent;
     SignalType itemRemovedEvent;
+    SignalType ipChangedEvent;
+    SignalType relayVectorChangedEvent;
 };
 
 class CurrentStateModel
