@@ -5,7 +5,6 @@
 #include <QDebug>
 
 namespace barmaley::lib {
-
 Facade::Facade()
     : facadeView(*this),
       requestManager(std::make_unique<RequestManager>()),
@@ -23,6 +22,5 @@ Facade::Facade()
         }
     });
 }
-} // namespace barmaley::lib
 Facade::~Facade() = default;
 } // namespace barmaley::lib
