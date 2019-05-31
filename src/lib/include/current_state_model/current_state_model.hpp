@@ -15,6 +15,7 @@ struct CurrentState
     std::string ip;
     std::uint32_t numberOfPacketsReceived = 0;
     std::chrono::system_clock::time_point lastUpdate;
+    bool isBusy = false;
 };
 class CurrentStateModel;
 
@@ -36,6 +37,7 @@ public:
     s2::connection onRemoved(SignalType::slot_type slot);
     s2::connection onIpChanged(SignalType::slot_type slot);
     s2::connection onRelayVectorChanged(SignalType::slot_type slot);
+    s2::connection onBusyChanged(SignalType::slot_type slot);
 
     const CurrentStateModel& currentStateModel;
 
@@ -45,6 +47,7 @@ protected:
     SignalType itemRemovedEvent;
     SignalType ipChangedEvent;
     SignalType relayVectorChangedEvent;
+    SignalType busyChangedEvent;
 };
 
 class CurrentStateModel
@@ -63,6 +66,8 @@ public:
     }
 
     const CurrentState* value(DeviceId id) const;
+
+    void setBusy(DeviceId id, bool busy);
 
     void insertOrUpdate(std::string ip, Status status);
 

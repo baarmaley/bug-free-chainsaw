@@ -23,6 +23,7 @@ Facade::Facade()
     });
 }
 Facade::~Facade() = default;
+
 void Facade::groupCommand(DeviceId id, GroupCommand cmd)
 {
     auto url = "http://" + model.value(id)->ip + "/action/";
@@ -36,10 +37,21 @@ void Facade::groupCommand(DeviceId id, GroupCommand cmd)
         default:
             break;
     }
+
+    model.setBusy(id, true);
+
+    auto busyGuard = [this, id] { model.setBusy(id, false); };
+
     requestManager->request(
         url,
-        [](auto) { qDebug() << "groupCommand: Ok"; },
-        [](RequestManager::Error e) { qDebug() << "groupCommand: Error" << QString::fromStdString(e.what); });
+        [busyGuard](auto) {
+            qDebug() << "groupCommand: Ok";
+            busyGuard();
+        },
+        [busyGuard](RequestManager::Error e) {
+            qDebug() << "groupCommand: Error" << QString::fromStdString(e.what);
+            busyGuard();
+        });
 }
 void Facade::singleCommand(DeviceId id, RelayId relayId, SingleCommand cmd)
 {
@@ -56,9 +68,20 @@ void Facade::singleCommand(DeviceId id, RelayId relayId, SingleCommand cmd)
             break;
     }
     url += "/" + std::to_string(toUint32(relayId));
+
+    model.setBusy(id, true);
+
+    auto busyGuard = [this, id] { model.setBusy(id, false); };
+
     requestManager->request(
         url,
-        [](auto) { qDebug() << "singleCommand: Ok"; },
-        [](RequestManager::Error e) { qDebug() << "singleCommand: Error" << QString::fromStdString(e.what); });
+        [busyGuard](auto) {
+            qDebug() << "singleCommand: Ok";
+            busyGuard();
+        },
+        [busyGuard](RequestManager::Error e) {
+            qDebug() << "singleCommand: Error" << QString::fromStdString(e.what);
+            busyGuard();
+        });
 }
 } // namespace barmaley::lib

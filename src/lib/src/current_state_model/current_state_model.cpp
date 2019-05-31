@@ -30,6 +30,11 @@ s2::connection CurrentStateModelView::onRelayVectorChanged(SignalType::slot_type
     return relayVectorChangedEvent.connect(std::move(slot));
 }
 
+s2::connection CurrentStateModelView::onBusyChanged(SignalType::slot_type slot)
+{
+    return busyChangedEvent.connect(std::move(slot));
+}
+
 CurrentStateModel::CurrentStateModel() : currentStateModelView(*this) {}
 
 CurrentStateModel::~CurrentStateModel()
@@ -47,6 +52,16 @@ const CurrentState* CurrentStateModel::value(DeviceId id) const
         return nullptr;
     }
     return &it->second;
+}
+
+void CurrentStateModel::setBusy(DeviceId id, bool busy)
+{
+    auto it = items.find(id);
+    if (it == items.end()) {
+        return;
+    }
+    it->second.isBusy = busy;
+    currentStateModelView.busyChangedEvent(id);
 }
 
 void CurrentStateModel::insertOrUpdate(std::string ip, Status status)

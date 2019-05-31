@@ -30,6 +30,7 @@ public:
     void singleCommand(DeviceId id, RelayId relayId, SingleCommand cmd);
 
 private:
+
     FacadeView facadeView;
     Receiver receiver;
     std::unique_ptr<RequestManager> requestManager;
