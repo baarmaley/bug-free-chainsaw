@@ -1,4 +1,4 @@
 #pragma once
 namespace barmaley::lib {
-struct Journal;
+class JournalManager;
 } // namespace barmaley::lib

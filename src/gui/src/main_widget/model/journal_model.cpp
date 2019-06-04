@@ -1,7 +1,9 @@
 #include "journal_model.hpp"
 
-#include <journal/journal.hpp>
 #include <common/local_time.hpp>
+#include <journal/journal.hpp>
+#include <journal/journal_entry.hpp>
+#include <journal/journal_manager_view.hpp>
 
 #include <QDebug>
 
@@ -52,7 +54,7 @@ QVariant JournalModel::data(const QModelIndex& index, int role) const
                 return "NONE";
             }
         case TypeColumn::TEXT:
-            return QString::fromStdString(value->text());
+            return QString::fromStdString(value->text);
         default:
             return QVariant();
     }

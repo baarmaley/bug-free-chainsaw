@@ -4,7 +4,8 @@
 #include <common/signals2.hpp>
 #include <current_state_model/current_state_model.hpp>
 #include <facade/facade_view.hpp>
-#include <journal/journal.hpp>
+#include <journal/journal_manager_fwd.hpp>
+#include <journal/journal_manager_view_fwd.hpp>
 #include <receiver/receiver.h>
 #include <request_manager/failed_request.hpp>
 #include <request_manager/request_manager_fwd.hpp>
@@ -24,11 +25,8 @@ public:
         return model.currentStateModelView;
     }
 
-    inline JournalManagerView& journalManagerView()
-    {
-        return journalManager.view();
-    }
-
+    JournalManagerView& journalManagerView();
+    
     void groupCommand(DeviceId id, GroupCommand cmd);
     void singleCommand(DeviceId id, RelayId relayId, SingleCommand cmd);
 
@@ -38,13 +36,13 @@ private:
     void request(DeviceId id, std::function<std::string(std::string)> urlBuilder);
 
     void statusRequest(DeviceId id, std::string ip, SuccessfulRequest successfulRequest);
-	void errorRequest(DeviceId id, FailedRequest failedRequest);
+	void errorRequest(DeviceId id, std::string ip, FailedRequest failedRequest);
 
     FacadeView facadeView;
     Receiver receiver;
     std::unique_ptr<RequestManager> requestManager;
     CurrentStateModel model;
-    JournalManager journalManager;
+    std::unique_ptr<JournalManager> journalManager;
     ConnectionsContainer connectionsContainer;
 };
 } // namespace barmaley::lib
