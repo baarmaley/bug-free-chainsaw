@@ -46,8 +46,8 @@ RequestManager::RequestManager()
     timer.start();
 }
 void RequestManager::request(std::string url,
-                             std::function<void(Success)> onSuccess,
-                             std::function<void(Error)> onError)
+                             std::function<void(SuccessfulRequest)> onSuccess,
+                             std::function<void(FailedRequest)> onError)
 {
     pplx::task<std::string> task;
     try {

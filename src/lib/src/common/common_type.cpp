@@ -18,12 +18,12 @@ void from_json(const json& j, WifiInfo& w)
     j.at("reconnect_count").get_to(w.reconnectCount);
     j.at("rssi").get_to(w.rssi);
 
-    // Todo: update after apply pr "Feat/explicit conversion operator" 
+    // Todo: update after apply pr "Feat/explicit conversion operator"
     // w.lastReasonReconnection = j.value("last_reason_reconnection", string_opt{std::nullopt});
     w.lastReasonReconnection = [&]() -> std::optional<std::string> {
-        try {
+        if (j.contains("last_reason_reconnection")) {
             return j.at("last_reason_reconnection").get<std::string>();
-        } catch (const json::out_of_range&) {
+        } else {
             return std::nullopt;
         }
     }();
