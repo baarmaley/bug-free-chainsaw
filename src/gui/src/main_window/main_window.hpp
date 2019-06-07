@@ -3,8 +3,10 @@
 #include <common/common_type.hpp>
 #include <common/signals2.hpp>
 
-#include <button/button_fwd.hpp>
 #include <current_state_model/current_state_model_fwd.hpp>
+#include <current_state_model/current_state_model_view_fwd.hpp>
+
+#include <button/button_fwd.hpp>
 #include <main_widget/control_panel/control_panel_view_fwd.hpp>
 
 #include <QPixmap>
@@ -45,7 +47,9 @@ private:
 
     std::unique_ptr<ControlPanelView> controlPanelView_;
 
-    QLabel* deviceName           = nullptr;
+    QLabel* deviceNameLabel      = nullptr;
+    QLabel* connectionLostLabel  = nullptr;
+    QLabel* waitLabel            = nullptr;
     QVBoxLayout* buttonContainer = nullptr;
 
     const lib::CurrentStateModel* currentStateModel = nullptr;

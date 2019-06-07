@@ -28,7 +28,9 @@ MainWindow::MainWindow(QWidget* parent)
     : QWidget(parent),
       logo(":/logo.png"),
       controlPanelView_(std::make_unique<ControlPanelView>()),
-      deviceName(new QLabel("UnknownName", this))
+      deviceNameLabel(new QLabel("UnknownName", this)),
+      connectionLostLabel(new QLabel("Connection lost...", this)),
+      waitLabel(new QLabel("wait...", this))
 {
     setObjectName("MainWindow");
     setStyleSheet(R"(
@@ -37,11 +39,19 @@ MainWindow::MainWindow(QWidget* parent)
             max-width: 248px;
             border-image: url(:/background.jpg) 0 0 0 0 stretch stretch;
         }
+		#InfoContainer{
+            min-height: 20px;
+            max-height: 20px;
+		}
         #NameLabel{
             color: white;
             font-size: 20px;
             font-weight: 500;
-        })");
+        }
+		#ConnectionLostLabel, #WaitLabel{
+			font-size: 15px;			
+			color: white;
+		})");
 
     setWindowFlags(Qt::MSWindowsFixedSizeDialogHint);
 
@@ -52,7 +62,6 @@ MainWindow::MainWindow(QWidget* parent)
     auto topLayout = new QVBoxLayout(this);
     topLayout->setSpacing(0);
     topLayout->setAlignment(Qt::AlignTop);
-    topLayout->setContentsMargins(0, 0, 0, 20);
     mainLayout->addLayout(topLayout);
 
     auto logoLabel = new QLabel(this);
@@ -61,17 +70,30 @@ MainWindow::MainWindow(QWidget* parent)
     topLayout->addWidget(logoLabel);
     topLayout->setAlignment(logoLabel, Qt::AlignHCenter);
 
-    deviceName->setObjectName("NameLabel");
-    topLayout->addWidget(deviceName);
-    topLayout->setAlignment(deviceName, Qt::AlignHCenter);
+    deviceNameLabel->setObjectName("NameLabel");
+    topLayout->addWidget(deviceNameLabel);
+    topLayout->setAlignment(deviceNameLabel, Qt::AlignHCenter);
+
+    auto infoContainer = new QWidget(this);
+    infoContainer->setObjectName("InfoContainer");
+    topLayout->addWidget(infoContainer);
+    auto infoLayout = new QVBoxLayout(infoContainer);
+    infoLayout->setContentsMargins(0, 0, 0, 0);
+
+    connectionLostLabel->setObjectName("ConnectionLostLabel");
+    infoLayout->addWidget(connectionLostLabel);
+    infoLayout->setAlignment(connectionLostLabel, Qt::AlignHCenter);
+
+    waitLabel->setObjectName("WaitLabel");
+    waitLabel->setVisible(false);
+    infoLayout->addWidget(waitLabel);
+    infoLayout->setAlignment(waitLabel, Qt::AlignHCenter);
 
     buttonContainer = new QVBoxLayout(this);
     buttonContainer->setSpacing(10);
     buttonContainer->setContentsMargins(10, 0, 10, 20);
     buttonContainer->setAlignment(Qt::AlignTop);
     mainLayout->addLayout(buttonContainer);
-
-    mainLayout->setStretchFactor(topLayout, 1);
 }
 
 void MainWindow::setModel(lib::CurrentStateModelView& modelView)
@@ -85,20 +107,13 @@ void MainWindow::setModel(lib::CurrentStateModelView& modelView)
         return false;
     };
 
-    connectionsContainer += modelView.onRelayVectorChanged([this, filter](lib::DeviceId key) {
+    connectionsContainer += modelView.onUpdate([this, filter](lib::DeviceId key) {
         if (filter(key)) {
             return;
         }
         setCurrentDevice(*currentDeviceId);
     });
     connectionsContainer += modelView.onAdded([this, filter](lib::DeviceId key) {
-        if (filter(key)) {
-            return;
-        }
-        setCurrentDevice(*currentDeviceId);
-    });
-
-    connectionsContainer += modelView.onBusyChanged([this, filter](lib::DeviceId key) {
         if (filter(key)) {
             return;
         }
@@ -116,7 +131,9 @@ void MainWindow::setCurrentDevice(lib::DeviceId id)
     if (!value) {
         return;
     }
-    deviceName->setText(QString::fromStdString(value->status.name));
+    deviceNameLabel->setText(QString::fromStdString(value->status.name));
+    connectionLostLabel->setVisible(value->connectionLost);
+    waitLabel->setVisible(!value->connectionLost && value->isBusy);
 
     const auto& relays = value->status.relays;
     for (std::size_t i = 0; i < relays.size(); ++i) {
@@ -135,7 +152,7 @@ void MainWindow::setCurrentDevice(lib::DeviceId id)
         auto bState = buttonState(cRelay.status);
 
         button->setState(bState);
-        button->setEnabled(!(bState == Button::StateType::notAvailable) && !value->isBusy);
+        button->setEnabled(!(bState == Button::StateType::notAvailable) && !value->isBusy && !value->connectionLost);
         button->setText(QString::fromStdString(cRelay.name));
     }
     while (buttons.size() > relays.size()) {

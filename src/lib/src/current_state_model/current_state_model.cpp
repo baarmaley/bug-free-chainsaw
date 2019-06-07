@@ -1,41 +1,23 @@
 #include <current_state_model/current_state_model.hpp>
 
+#include <chrono>
+
 namespace barmaley::lib {
-CurrentStateModelView::CurrentStateModelView(const CurrentStateModel& currentStateModel)
-    : currentStateModel(currentStateModel)
+CurrentStateModel::CurrentStateModel() : currentStateModelView(*this), updateTimer(std::chrono::milliseconds{250})
 {
-}
-CurrentStateModelView::~CurrentStateModelView() = default;
+    connectionsContainer += updateTimer.onTimeout([this] {
+        auto now = std::chrono::system_clock::now();
+        for (auto& [key, value] : items) {
+            if (!value.connectionLost && (value.lastUpdate + intervalUdpdate) < now) {
+                value.connectionLost = true;
+                currentStateModelView.connectLostEvent(key);
+                currentStateModelView.itemUpdateEvent(key);
+            }
+        }
+    });
 
-s2::connection CurrentStateModelView::onAdded(SignalType::slot_type slot)
-{
-    return itemAddedEvent.connect(std::move(slot));
+    updateTimer.start();
 }
-s2::connection CurrentStateModelView::onUpdate(SignalType::slot_type slot)
-{
-    return itemUpdateEvent.connect(std::move(slot));
-}
-s2::connection CurrentStateModelView::onRemoved(SignalType::slot_type slot)
-{
-    return itemRemovedEvent.connect(std::move(slot));
-}
-
-s2::connection CurrentStateModelView::onIpChanged(SignalType::slot_type slot)
-{
-    return ipChangedEvent.connect(std::move(slot));
-}
-
-s2::connection CurrentStateModelView::onRelayVectorChanged(SignalType::slot_type slot)
-{
-    return relayVectorChangedEvent.connect(std::move(slot));
-}
-
-s2::connection CurrentStateModelView::onBusyChanged(SignalType::slot_type slot)
-{
-    return busyChangedEvent.connect(std::move(slot));
-}
-
-CurrentStateModel::CurrentStateModel() : currentStateModelView(*this) {}
 
 CurrentStateModel::~CurrentStateModel()
 {
@@ -62,6 +44,7 @@ void CurrentStateModel::setBusy(DeviceId id, bool busy)
     }
     it->second.isBusy = busy;
     currentStateModelView.busyChangedEvent(id);
+    currentStateModelView.itemUpdateEvent(id);
 }
 
 void CurrentStateModel::insertOrUpdate(std::string ip, Status status)
@@ -74,12 +57,30 @@ void CurrentStateModel::insertOrUpdate(std::string ip, Status status)
                       std::forward_as_tuple(std::move(status), std::move(ip), std::chrono::system_clock::now()));
         currentStateModelView.itemAddedEvent(deviceId);
     } else {
-        if (it->second.ip != ip) {
-            it->second.ip = ip;
-            currentStateModelView.ipChangedEvent(deviceId);
+        auto& cState  = it->second;
+        auto& cStatus = cState.status;
+
+        if (cState.ip != ip) {
+            auto oldIp = std::move(cState.ip);
+            cState.ip  = ip;
+            currentStateModelView.ipChangedEvent(deviceId, std::move(oldIp), ip);
         }
-        bool updateVectorSlot = (it->second.status.relays != status.relays);
-        it->second.status     = std::move(status);
+        bool updateVectorSlot = (cStatus.relays != status.relays);
+
+        auto oldStatus = std::move(cStatus);
+        cStatus        = std::move(status);
+
+        if (oldStatus.uptime > cStatus.uptime) {
+            currentStateModelView.rebootDetectEvent(deviceId);
+        } else if (oldStatus.wifiInfo.connectionDuration > cStatus.wifiInfo.connectionDuration) {
+            currentStateModelView.reconnectDetectedEvent(deviceId);
+        }
+
+        if (cState.connectionLost) {
+            cState.connectionLost = false;
+            currentStateModelView.connectionRestoredEvent(deviceId);
+        }
+
         if (updateVectorSlot) {
             currentStateModelView.relayVectorChangedEvent(deviceId);
         }

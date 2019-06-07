@@ -1,5 +1,5 @@
 #pragma once
 
 namespace barmaley::lib {
-class CurrentStateModel;
+struct CurrentState;
 } // namespace barmaley::lib

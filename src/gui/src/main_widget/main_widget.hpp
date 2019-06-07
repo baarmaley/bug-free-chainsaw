@@ -7,6 +7,7 @@
 #include <main_widget/model/model_list_fwd.hpp>
 
 #include <current_state_model/current_state_model_fwd.hpp>
+#include <current_state_model/current_state_model_view_fwd.hpp>
 
 #include <QWidget>
 

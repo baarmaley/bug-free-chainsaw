@@ -11,6 +11,7 @@
 #include <common/common_type.hpp>
 #include <common/signals2.hpp>
 #include <current_state_model/current_state_model_fwd.hpp>
+#include <current_state_model/current_state_model_view_fwd.hpp>
 
 namespace barmaley::gui {
 class Model : public QAbstractTableModel
@@ -25,7 +26,7 @@ public:
         LAST_UPDATE,
         ID,
         DEVICE_TYPE,
-		DEVICE_NAME,
+        DEVICE_NAME,
         LAST_CHANGED,
         UPTIME,
         HEAP,

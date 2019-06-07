@@ -7,6 +7,12 @@
 #include <QDebug>
 
 namespace barmaley::lib {
+namespace {
+std::string to_string(lib::DeviceId id)
+{
+    return std::to_string(toUint32(id));
+}
+} // namespace
 Facade::Facade()
     : requestManager(std::make_unique<RequestManager>()), journalManager(std::make_unique<JournalManager>())
 {
@@ -15,6 +21,32 @@ Facade::Facade()
             auto p = receiver.packet();
             updateModel(std::move(p.ip), std::move(p.data));
         }
+    });
+    auto& modelView = model.currentStateModelView;
+
+    connectionsContainer += modelView.onAdded([this](lib::DeviceId id) {
+        journalManager->addEntry(JournalEntryType::device_detected, "id: " + to_string(id));
+    });
+
+    connectionsContainer += modelView.onIpChanged([this](lib::DeviceId id, std::string oldIp, std::string newIp) {
+        journalManager->addEntry(JournalEntryType::ip_changed,
+                                 "id: " + to_string(id) + " old ip: " + oldIp + " new ip: " + newIp);
+    });
+
+    connectionsContainer += modelView.onConnectionRestored([this](lib::DeviceId id) {
+        journalManager->addEntry(JournalEntryType::connection_restored, "id: " + to_string(id));
+    });
+
+    connectionsContainer += modelView.onConnectLost([this](lib::DeviceId id) {
+        journalManager->addEntry(JournalEntryType::connection_lost, "id: " + to_string(id));
+    });
+
+    connectionsContainer += modelView.onRebootDetect([this](lib::DeviceId id) {
+        journalManager->addEntry(JournalEntryType::reboot_detect, "id: " + to_string(id));
+    });
+
+    connectionsContainer += modelView.onReconnectDetected([this](lib::DeviceId id) {
+        journalManager->addEntry(JournalEntryType::reconnect_detected, "id: " + to_string(id));
     });
 }
 Facade::~Facade() = default;
