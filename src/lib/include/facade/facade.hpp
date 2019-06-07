@@ -3,7 +3,6 @@
 #include <common/relay_command.hpp>
 #include <common/signals2.hpp>
 #include <current_state_model/current_state_model.hpp>
-#include <facade/facade_view.hpp>
 #include <journal/journal_manager_fwd.hpp>
 #include <journal/journal_manager_view_fwd.hpp>
 #include <receiver/receiver.h>
@@ -38,7 +37,6 @@ private:
     void statusRequest(DeviceId id, std::string ip, SuccessfulRequest successfulRequest);
 	void errorRequest(DeviceId id, std::string ip, FailedRequest failedRequest);
 
-    FacadeView facadeView;
     Receiver receiver;
     std::unique_ptr<RequestManager> requestManager;
     CurrentStateModel model;

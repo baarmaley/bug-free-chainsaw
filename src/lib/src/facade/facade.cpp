@@ -8,9 +8,7 @@
 
 namespace barmaley::lib {
 Facade::Facade()
-    : facadeView(*this),
-      requestManager(std::make_unique<RequestManager>()),
-      journalManager(std::make_unique<JournalManager>())
+    : requestManager(std::make_unique<RequestManager>()), journalManager(std::make_unique<JournalManager>())
 {
     connectionsContainer += receiver.onReceived([this] {
         while (!receiver.empty()) {
@@ -67,7 +65,7 @@ void Facade::updateModel(std::string ip, std::string data)
     try {
         model.insertOrUpdate(ip, json::parse(std::move(data)).at("status"));
     } catch (const json::exception& e) {
-        facadeView.protocolErrorEvent(ip, e.what());
+        journalManager->addEntry(lib::JournalEntryType::bad_protocol, ip + ": " + e.what());
     }
 }
 void Facade::request(DeviceId id, std::function<std::string(std::string)> urlBuilder)

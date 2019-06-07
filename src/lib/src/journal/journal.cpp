@@ -1,7 +1,6 @@
 #include <journal/journal.hpp>
 
 #include <current_state_model/current_state_model.hpp>
-#include <facade/facade_view.hpp>
 
 namespace barmaley::lib {
 std::vector<const JournalEntry*> Journal::valuesView() const
