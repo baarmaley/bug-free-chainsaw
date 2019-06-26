@@ -16,7 +16,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include("utils.cmake")
 
 add_subdirectory(gui)
-#add_subdirectory(gui_test)
 add_subdirectory(lib)
+add_subdirectory(qml_gui)
+
 
 

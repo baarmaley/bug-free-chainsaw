@@ -13,7 +13,6 @@ QString toLocalTime(const std::chrono::system_clock::time_point tp)
 {
     return QString::fromStdString(lib::localtime(tp, "%d.%m.%y %T"));
 }
-
 } // namespace
 
 Model::Model(lib::CurrentStateModelView& modelView) : currentStateModel(modelView.currentStateModel)
