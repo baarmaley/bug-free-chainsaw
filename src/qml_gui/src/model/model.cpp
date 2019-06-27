@@ -26,6 +26,7 @@ DeviceList::DeviceList(lib::CurrentStateModelView& modelView) : currentStateMode
     m_roleNames[reconnect_count]          = "reconnect_count";
     m_roleNames[last_reason_reconnection] = "last_reason_reconnection";
     m_roleNames[rssi]                     = "rssi";
+    m_roleNames[is_connection_lost]       = "is_connection_lost";
 
     for (auto [key, value] : this->currentStateModel.values()) {
         order.push_back(key);
@@ -89,6 +90,8 @@ QVariant DeviceList::data(const QModelIndex& index, int role) const
                                                      : QStringLiteral("-");
         case rssi:
             return wifiInfo.rssi;
+        case is_connection_lost:
+            return value.connectionLost;
         default:
             return QVariant();
     }

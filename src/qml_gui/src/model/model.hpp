@@ -27,6 +27,7 @@ public:
         reconnect_count,
         last_reason_reconnection,
         rssi,
+		is_connection_lost,
     };
 
     DeviceList(lib::CurrentStateModelView& modelView);
