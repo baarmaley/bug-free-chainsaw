@@ -16,7 +16,7 @@ DeviceList::DeviceList(lib::CurrentStateModelView& modelView) : currentStateMode
     m_roleNames[ip_role]                  = "ip";
     m_roleNames[packets_received]         = "packets_received";
     m_roleNames[last_update]              = "last_update";
-    m_roleNames[id]                       = "id";
+    m_roleNames[id]                       = "device_id";
     m_roleNames[device_type]              = "device_type";
     m_roleNames[device_name]              = "device_name";
     m_roleNames[last_changed]             = "last_changed";

@@ -16,15 +16,19 @@ ApplicationWindow
         clip: true
 
         model: deviceListModel
-        /*
-        model: ListModel{
-            ListElement { device_name: "Desk"; ip: "192.168.1.1";  is_connection_lost: true }
-            ListElement { device_name: "Route"; ip: "192.168.1.2"; is_connection_lost: false }
+
+        /*model: ListModel{
+            ListElement { device_id: 25; device_name: "Desk"; ip: "192.168.1.1";  is_connection_lost: true }
+            ListElement { device_id: 45; device_name: "Route"; ip: "192.168.1.2"; is_connection_lost: false }
         }*/
 
         spacing: 5
 
-        delegate: DeviceDelegate{}
+        delegate: DeviceDelegate{
+              onClickedDelegate: {
+                console.log("id: ", device_id)
+            }
+        }
 
     }
 
