@@ -2,5 +2,6 @@
   <qresource prefix="/">
     <file>main.qml</file>
     <file>DeviceDelegate.qml</file>
+    <file>DevicePage.qml</file>
   </qresource>
 </RCC>
