@@ -3,5 +3,6 @@
     <file>main.qml</file>
     <file>DeviceDelegate.qml</file>
     <file>DevicePage.qml</file>
+    <file>ElevationEffect.qml</file>
   </qresource>
 </RCC>

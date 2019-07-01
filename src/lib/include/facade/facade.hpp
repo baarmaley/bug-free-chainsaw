@@ -10,8 +10,8 @@
 #include <request_manager/request_manager_fwd.hpp>
 #include <request_manager/successful_request.hpp>
 
-#include <memory>
 #include <functional>
+#include <memory>
 namespace barmaley::lib {
 class Facade
 {
@@ -24,18 +24,23 @@ public:
         return model.currentStateModelView;
     }
 
+    inline const CurrentStateModel& currentStateModel() const
+    {
+        return model;
+    }
+
     JournalManagerView& journalManagerView();
-    
+
     void groupCommand(DeviceId id, GroupCommand cmd);
     void singleCommand(DeviceId id, RelayId relayId, SingleCommand cmd);
 
 private:
-	void updateModel(std::string ip, std::string data);
+    void updateModel(std::string ip, std::string data);
 
     void request(DeviceId id, std::function<std::string(std::string)> urlBuilder);
 
     void statusRequest(DeviceId id, std::string ip, SuccessfulRequest successfulRequest);
-	void errorRequest(DeviceId id, std::string ip, FailedRequest failedRequest);
+    void errorRequest(DeviceId id, std::string ip, FailedRequest failedRequest);
 
     Receiver receiver;
     std::unique_ptr<RequestManager> requestManager;

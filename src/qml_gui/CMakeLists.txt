@@ -5,7 +5,7 @@ project(qml_gui VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5 COMPONENTS Core Widgets Qml Quick REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Qml Quick QuickControls2 REQUIRED)
 
     
 file(GLOB_RECURSE TARGET_SOURCES 
@@ -36,6 +36,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt5::Widgets
         Qt5::Qml
         Qt5::Quick
+        Qt5::QuickControls2
         barmaley::lib)
 
 target_include_directories(${PROJECT_NAME}

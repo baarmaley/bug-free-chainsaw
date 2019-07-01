@@ -36,6 +36,11 @@ const CurrentState* CurrentStateModel::value(DeviceId id) const
     return &it->second;
 }
 
+bool CurrentStateModel::hasValue(DeviceId id) const
+{
+    return items.find(id) != items.end();
+}
+
 void CurrentStateModel::setBusy(DeviceId id, bool busy)
 {
     auto it = items.find(id);

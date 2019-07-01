@@ -28,6 +28,8 @@ public:
 
     const CurrentState* value(DeviceId id) const;
 
+    bool hasValue(DeviceId id) const;
+
     void setBusy(DeviceId id, bool busy);
 
     void insertOrUpdate(std::string ip, Status status);

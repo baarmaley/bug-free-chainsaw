@@ -1,4 +1,4 @@
-#include "model.hpp"
+#include "device_list.hpp"
 
 #include <common/local_time.hpp>
 #include <current_state_model/current_state_model.hpp>
@@ -63,6 +63,8 @@ QVariant DeviceList::data(const QModelIndex& index, int role) const
     const auto& wifiInfo = status.wifiInfo;
 
     switch (role) {
+        case Qt::DisplayRole:
+            return "Device";
         case ip_role:
             return QString::fromStdString(value.ip);
         case packets_received:
