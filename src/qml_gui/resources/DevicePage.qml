@@ -5,19 +5,35 @@ import QtQuick.Layouts 1.12
 
 Item{
     signal clickedRelay(int device_id, int relay_id)
-
     id: devicePage
     Text{
         id: nameDevice
         text: deviceItem.deviceName
+        font.pointSize: 16
         font.bold: true
-        font.pointSize: 14
         anchors.horizontalCenter: parent.horizontalCenter
+    }
+    Text{
+        id: stateDevice
+        text: {
+            if(deviceItem.connected){
+                return deviceItem.busy ? "wait..." : ""
+            }else{
+                return "Connection lost..."
+            }
+        }
+
+        anchors.topMargin: 2
+        anchors.bottomMargin: 2
+        font.pointSize: 10
+        color: Material.color(Material.Grey)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: nameDevice.bottom
     }
     ListView{
         anchors.right: parent.right
         anchors.left: parent.left
-        anchors.top: nameDevice.bottom
+        anchors.top: stateDevice.bottom
         anchors.bottom: devicePage.bottom
         anchors.margins: 1
         clip: true
@@ -90,26 +106,6 @@ Item{
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
