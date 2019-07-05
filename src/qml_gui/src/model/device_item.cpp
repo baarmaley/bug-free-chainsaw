@@ -29,6 +29,10 @@ bool DeviceItem::isBusy() const
 {
     return m_busy;
 }
+bool DeviceItem::isConnected() const
+{
+    return m_connected;
+}
 int DeviceItem::getCurrentDevice() const
 {
     return currentDevice ? toUint32(*currentDevice) : -1;
@@ -77,6 +81,7 @@ void DeviceItem::update(std::optional<lib::DeviceId> id)
         currentDeviceName = "";
         countPackets      = "";
         m_busy            = false;
+        m_connected       = false;
 
         beginRemoveRows(QModelIndex(), 0, rowCount());
         if (!m_items.empty()) {
@@ -85,12 +90,12 @@ void DeviceItem::update(std::optional<lib::DeviceId> id)
         endRemoveRows();
 
     } else {
-        auto device       = currentStateModel.value(*id);
-        currentDevice     = id;
-        currentDeviceName = QString::fromStdString(device->status.name);
-        countPackets      = QString::number(device->numberOfPacketsReceived);
-        m_busy            = device->isBusy;
-
+        auto device        = currentStateModel.value(*id);
+        currentDevice      = id;
+        currentDeviceName  = QString::fromStdString(device->status.name);
+        countPackets       = QString::number(device->numberOfPacketsReceived);
+        m_busy             = device->isBusy;
+        m_connected        = !device->connectionLost;
         const auto& relays = device->status.relays;
         for (std::size_t i = 0; i < relays.size(); ++i) {
             if (i >= m_items.size()) {
@@ -121,6 +126,7 @@ void DeviceItem::update(std::optional<lib::DeviceId> id)
     emit deviceNameChanged(getDeviceName());
     emit countPacketsChanged(getCountPackets());
     emit busyChanged(isBusy());
+    emit connectedChanged(isConnected());
 }
 
 QHash<int, QByteArray> DeviceItem::roleNames() const

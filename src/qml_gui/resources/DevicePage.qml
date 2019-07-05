@@ -31,7 +31,7 @@ Item{
         delegate: ItemDelegate{
             id: control
             width: parent.width
-            enabled: !deviceItem.busy
+            enabled: !deviceItem.busy && deviceItem.connected
             onClicked: {
                 console.log("current_device: " + deviceItem.currentDevice + " relay_id " + model.relay_id)
                 clickedRelay(deviceItem.currentDevice, model.relay_id)

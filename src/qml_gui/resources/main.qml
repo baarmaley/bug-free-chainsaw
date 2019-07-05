@@ -31,6 +31,11 @@ ApplicationWindow
                 verticalAlignment: Qt.AlignVCenter
                 Layout.fillWidth: true
             }
+            Item {
+                height: parent.height
+                width: backToolButton.width
+                visible: backToolButton.visible
+            }
         }
     }
 

@@ -15,6 +15,7 @@ class DeviceItem : public QAbstractListModel
     Q_PROPERTY(int currentDevice READ getCurrentDevice WRITE setCurrentDevice NOTIFY currentDeviceChanged)
     Q_PROPERTY(QString countPacket READ getCountPackets NOTIFY countPacketsChanged)
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    Q_PROPERTY(bool connected READ isConnected NOTIFY connectedChanged)
 
 public:
     struct RelayItem
@@ -36,6 +37,7 @@ public:
     QString getDeviceName() const;
     QString getCountPackets() const;
     bool isBusy() const;
+    bool isConnected() const;
 
     int getCurrentDevice() const;
     void setCurrentDevice(int);
@@ -48,6 +50,7 @@ signals:
     void currentDeviceChanged(int);
     void countPacketsChanged(QString);
     void busyChanged(bool);
+    void connectedChanged(bool);
 
 protected:
     QHash<int, QByteArray> roleNames() const override;
@@ -60,6 +63,7 @@ private:
     QString currentDeviceName;
     QString countPackets;
     bool m_busy = false;
+    bool m_connected = false;
     std::vector<RelayItem> m_items;
     QHash<int, QByteArray> m_roleNames;
     lib::ConnectionsContainer connectionsContainer;
