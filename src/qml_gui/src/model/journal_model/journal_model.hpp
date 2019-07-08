@@ -23,8 +23,10 @@ public:
         text,
     };
     int rowCount(const QModelIndex& = QModelIndex()) const override;
-
     QVariant data(const QModelIndex&, int) const override;
+
+protected:
+	QHash<int, QByteArray> roleNames() const override;
 
 private:
     const lib::Journal& journal;

@@ -17,7 +17,7 @@ JournalModel::JournalModel(lib::JournalManagerView& journalManagerView)
     m_roleNames[text] = "text";
 
     connectionsContainer += journalManagerView.onAdded([this](lib::JournalEntryId key) {
-        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        beginInsertRows(QModelIndex(), 0, 0);
         order.push_back(key);
         endInsertRows();
     });
@@ -38,10 +38,10 @@ QVariant JournalModel::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
-    auto key          = order[index.row()];
-    const auto& value = journal.value(key);
+    auto key          = order.rbegin() + index.row();
+    const auto& value = journal.value(*key);
 
-    switch (index.column()) {
+    switch (role) {
         case Qt::DisplayRole:
             return "Journal entry";
         case date: {
@@ -59,5 +59,9 @@ QVariant JournalModel::data(const QModelIndex& index, int role) const
         default:
             return QVariant();
     }
+}
+QHash<int, QByteArray> JournalModel::roleNames() const
+{
+    return m_roleNames;
 }
 } // namespace barmaley::gui

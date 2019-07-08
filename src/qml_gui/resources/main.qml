@@ -54,6 +54,10 @@ ApplicationWindow
 
                     MenuItem {
                         text: "Journal"
+                        onTriggered: {
+                            console.log("current item: " + stackView.currentItem.objectName)
+                            stackView.push("JournalPage.qml")
+                        }
                     }
                     MenuItem {
                         text: "About"
@@ -80,6 +84,8 @@ ApplicationWindow
 
         initialItem:
             ListView {
+            id: mainPage
+            objectName: "mainPage"
             clip: true
 
             model: deviceListModel

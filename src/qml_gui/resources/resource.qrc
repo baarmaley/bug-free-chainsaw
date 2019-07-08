@@ -3,6 +3,7 @@
     <file>main.qml</file>
     <file>DeviceDelegate.qml</file>
     <file>DevicePage.qml</file>
+    <file>JournalPage.qml</file>
     <file>ElevationEffect.qml</file>
     <file>icons/gallery/index.theme</file>
     <file>icons/gallery/20x20/back.png</file>
