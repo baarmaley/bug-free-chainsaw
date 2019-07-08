@@ -16,9 +16,14 @@ ApplicationWindow
         Material.background: Material.Blue
         RowLayout {
             anchors.fill: parent
+            Item {
+                height: parent.height
+                width: menuButton.width
+                visible: menuButton.visible
+            }
             ToolButton {
                 id: backToolButton
-                text: qsTr("‹")
+                icon.name: "back"
                 visible: stackView.depth > 1
                 onClicked: stackView.pop()
             }
@@ -35,6 +40,25 @@ ApplicationWindow
                 height: parent.height
                 width: backToolButton.width
                 visible: backToolButton.visible
+            }
+            ToolButton {
+                id: menuButton
+                icon.name: "menu"
+                visible: !(stackView.depth > 1)
+                onClicked: optionsMenu.open()
+
+                Menu {
+                    id: optionsMenu
+                    x: parent.width - width
+                    transformOrigin: Menu.TopRight
+
+                    MenuItem {
+                        text: "Journal"
+                    }
+                    MenuItem {
+                        text: "About"
+                    }
+                }
             }
         }
     }
