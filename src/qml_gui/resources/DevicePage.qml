@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.12
 Item{
     signal clickedRelay(int device_id, int relay_id)
     id: devicePage
+    objectName: "devicePage"
     Text{
         id: nameDevice
         text: deviceItem.deviceName

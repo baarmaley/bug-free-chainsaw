@@ -18,8 +18,8 @@ ApplicationWindow
             anchors.fill: parent
             Item {
                 height: parent.height
-                width: menuButton.width
-                visible: menuButton.visible
+                width: rowMenu.width
+                visible: !backToolButton.visible
             }
             ToolButton {
                 id: backToolButton
@@ -37,30 +37,53 @@ ApplicationWindow
                 Layout.fillWidth: true
             }
             Item {
+                id: fakeBackItem
                 height: parent.height
                 width: backToolButton.width
-                visible: backToolButton.visible
+                visible: backToolButton.visible && !menuButton.visible && !commandButton.visible
             }
-            ToolButton {
-                id: menuButton
-                icon.name: "menu"
-                visible: !(stackView.depth > 1)
-                onClicked: optionsMenu.open()
+            RowLayout{
+                id: rowMenu
+                spacing: 0
+                ToolButton {
+                    id: menuButton
+                    icon.name: "menu"
+                    visible: !(stackView.depth > 1)
+                    onClicked: optionsMenu.open()
 
-                Menu {
-                    id: optionsMenu
-                    x: parent.width - width
-                    transformOrigin: Menu.TopRight
+                    Menu {
+                        id: optionsMenu
+                        x: parent.width - width
+                        transformOrigin: Menu.TopRight
 
-                    MenuItem {
-                        text: "Journal"
-                        onTriggered: {
-                            console.log("current item: " + stackView.currentItem.objectName)
-                            stackView.push("JournalPage.qml")
+                        MenuItem {
+                            text: "Journal"
+                            onTriggered: {
+                                console.log(rowMenu.width)
+                                stackView.push("JournalPage.qml")
+                            }
+                        }
+                        MenuItem {
+                            text: "About"
                         }
                     }
-                    MenuItem {
-                        text: "About"
+                }
+                ToolButton{
+                    id: commandButton
+                    icon.name: "menu"
+                    visible: stackView.currentItem.objectName == "devicePage"
+                    onClicked: commandMenu.open()
+                    Menu{
+                        id: commandMenu
+                        x: parent.width - width
+                        transformOrigin: Menu.TopRight
+                        MenuItem {
+                            text: "Turn off all"
+                            onTriggered: console.log("rowMenu: " + rowMenu.width + " fakeItem: " + fakeBackItem.width)
+                        }
+                        MenuItem {
+                            text: "Turn on all"
+                        }
                     }
                 }
             }
